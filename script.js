@@ -1,121 +1,189 @@
-let cont = 0;
+let itensExibidos = 0;
+let registros = [];
 
-document.getElementById("limpar").addEventListener("click", () => {
+let toast = document.getElementById("toast");
+let bstoast = new bootstrap.Toast(toast);
 
-    document.getElementById("nome").value = "";
-    document.getElementById("cep").value = "";
-    document.getElementById("numero").value = "";
-    document.getElementById("complemento").value = "";
-    document.getElementById("tele").value = "";
-    document.getElementById("url").value = "";
-});
-
-document.getElementById("form").addEventListener("submit", (e) => {
-
-    e.preventDefault();
-
-    let infos = document.getElementById("infos");
-
-    let nome = document.getElementById("nome").value;
-    let cep = document.getElementById("cep").value;
-    let numero = document.getElementById("numero").value;
-    let complemento = document.getElementById("complemento").value;
-    let tele = document.getElementById("tele").value;
-    let url = document.getElementById("foto").value;
-
-    if (cont % 3 === 0) {
-        let divRow = document.createElement("div");
-        divRow.classList.add("row", "g-3");
-        infos.appendChild(divRow);
-    }
-
-    let lastRow = infos.lastElementChild;
-    lastRow.classList.add("mb-3");
-
-    let card = document.createElement("div");
-    let divSec = document.createElement("div");
-
-    let url1 = document.createElement("img");
-    let nome1 = document.createElement("h3");
-    let tele1 = document.createElement("p");
-    let cep1 = document.createElement("p");
-    let numero1 = document.createElement("p");
-    let complemento1 = document.createElement("p");
-
-    let editar = document.createElement("button");
-    let excluir = document.createElement("button");
-
-    editar.classList.add("btn", "btn-primary", "mb-2");
-    excluir.classList.add("btn", "btn-danger");
-
-    card.classList.add("card", "rounded", "shadow-sm", "p-3", "mb-3", "bg-body");
-    divSec.classList.add("col");
-
-    url1.src = url;
-    url1.alt = "Imagem";
-    url1.classList.add("img-fluid", "mb-3", "imagens");
-    nome1.textContent = "Nome: " + nome;
-    nome1.classList.add("mb-3")
-    tele1.textContent = "Telefone: " + tele;
-    cep1.textContent = "CEP: " + cep;
-    numero1.textContent = "Numero: " + numero;
-    complemento1.textContent = "Complemento: " + complemento;
-
-    editar.textContent = "Editar";
-    excluir.textContent = "Excluir";
-
-    card.appendChild(url1);
-    card.appendChild(nome1);
-    card.appendChild(tele1);
-    card.appendChild(cep1);
-    card.appendChild(numero1);
-    card.appendChild(complemento1);
-    card.appendChild(editar);
-    card.appendChild(excluir);
-
-    let col = document.createElement("div");
-    col.classList.add("col-md-4");
-    col.appendChild(card);
-    lastRow.appendChild(col);
-
-    cont++;
-
-    excluir.addEventListener("click", () => {
-        col.remove();
-        cont--;
-    });
-
-    editar.addEventListener("click", () => {
-        let modal = document.getElementById("editarModal");
-        modal.style.display = "block";
-
-        document.getElementById("nome-e").value = nome1.textContent.replace("Nome: ", "");
-        document.getElementById("cep-e").value = cep1.textContent.replace("CEP: ", "");
-        document.getElementById("numero-e").value = numero1.textContent.replace("Numero: ", "");
-        document.getElementById("complemento-e").value = complemento1.textContent.replace("Complemento: ", "");
-        document.getElementById("tele-e").value = tele1.textContent.replace("Telefone: ", "");
-        document.getElementById("url-e").value = url1.src;
-
-        document.getElementById("form-e").onsubmit = (e) => {
-            e.preventDefault();
-
-            url1.src = document.getElementById("url-e").value;
-            nome1.textContent = document.getElementById("nome-e").value;
-            tele1.textContent = document.getElementById("tele-e").value;
-            cep1.textContent = document.getElementById("cep-e").value;
-            numero1.textContent = document.getElementById("numero-e").value;
-            complemento1.textContent = document.getElementById("complemento-e").value;
-
-            modal.style.display = "none";
-        };
-    });
-});
+document.getElementById("limpar").addEventListener("click", () => limparForm());
 
 document.getElementById("nome").addEventListener("input", () => validarNome("nome"));
 document.getElementById("cep").addEventListener("input", () => validarCEP("cep"));
 document.getElementById("numero").addEventListener("input", () => validarNumero("numero"));
 document.getElementById("tele").addEventListener("input", () => validarTelefone("tele"));
 document.getElementById("foto").addEventListener("input", () => validarURL("foto"));
+
+document.getElementById("fechar1").addEventListener("click", fecharModal);
+document.getElementById("fechar2").addEventListener("click", fecharModal);
+
+document.getElementById("form").addEventListener("submit", (e) => subirForm(e));
+
+function renderizarGrid() {
+    let infos = document.getElementById("infos");
+    infos.innerHTML = ""; 
+
+    registros.slice(0, itensExibidos).forEach((registro, index) => {
+        let col = document.createElement("div");
+        col.classList.add("col-md-4");
+
+        let card = document.createElement("div");
+        card.classList.add("card", "p-3", "mb-3", "shadow-sm");
+
+        let urlImg = document.createElement("img");
+        urlImg.src = registro.foto;
+        urlImg.alt = "Imagem";
+        urlImg.classList.add("img-fluid", "mb-3", "imagens");
+
+        let nome = document.createElement("h3");
+        nome.textContent = "Nome: " + registro.nome;
+        nome.classList.add("mb-2");
+
+        let tele = document.createElement("p");
+        tele.textContent = "Telefone: " + registro.tele;
+
+        let cep = document.createElement("p");
+        cep.textContent = "CEP: " + registro.cep;
+
+        let numero = document.createElement("p");
+        numero.textContent = "Número: " + registro.numero;
+
+        let complemento = document.createElement("p");
+        complemento.textContent = "Complemento: " + registro.complemento;
+
+        let editar = document.createElement("button");
+        editar.textContent = "Editar";
+        editar.classList.add("btn", "btn-primary");
+        editar.addEventListener("click", () => abrirModal(registro, index));
+
+        let excluir = document.createElement("button");
+        excluir.textContent = "Excluir";
+        excluir.classList.add("btn", "btn-danger", "me-2");
+        excluir.addEventListener("click", () => excluirRegistro(index));
+
+        let divBtn = document.createElement("div");
+        divBtn.classList.add("col", "text-end");
+
+        card.appendChild(urlImg);
+        card.appendChild(nome);
+        card.appendChild(tele);
+        card.appendChild(cep);
+        card.appendChild(numero);
+        card.appendChild(complemento);
+        divBtn.appendChild(excluir);
+        divBtn.appendChild(editar);
+        card.appendChild(divBtn);
+
+        col.appendChild(card);
+        infos.appendChild(col);
+    });
+
+    atualizarBotaoMostrarMais();
+}
+
+function atualizarBotaoMostrarMais() {
+    let btnMostrarMais = document.getElementById("btnMostrarMais");
+
+    if (itensExibidos < registros.length) {
+        btnMostrarMais.style.display = "block";
+    } else {
+        btnMostrarMais.style.display = "none";
+    }
+}
+
+function mostrarMais() {
+    itensExibidos += 6; 
+    renderizarGrid(); 
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    itensExibidos = 6; 
+    renderizarGrid();
+
+    let btnMostrarMais = document.getElementById("btnMostrarMais");
+    btnMostrarMais.addEventListener("click", mostrarMais);
+});
+
+function subirForm(e) {
+
+    e.preventDefault();
+
+    let nome = document.getElementById("nome").value;
+    let cep = document.getElementById("cep").value;
+    let numero = document.getElementById("numero").value;
+    let complemento = document.getElementById("complemento").value;
+    let tele = document.getElementById("tele").value;
+    let foto = document.getElementById("foto").value;
+
+    let registro = { nome, cep, numero, complemento, tele, foto };
+    registros.push(registro);
+
+    mostrarToast("Informacoes registradas!");
+
+    renderizarGrid();
+};
+
+function abrirModal(registro, index) {
+    let modal = document.getElementById("editarModal");
+    modal.style.display = "block";
+
+    document.getElementById("nome-e").value = registro.nome;
+    document.getElementById("cep-e").value = registro.cep;
+    document.getElementById("numero-e").value = registro.numero;
+    document.getElementById("complemento-e").value = registro.complemento;
+    document.getElementById("tele-e").value = registro.tele;
+    document.getElementById("foto-e").value = registro.foto;
+
+    document.getElementById("nome-e").addEventListener("input", () => validarNome("nome-e"));
+    document.getElementById("cep-e").addEventListener("input", () => validarCEP("cep-e"));
+    document.getElementById("numero-e").addEventListener("input", () => validarNumero("numero-e"));
+    document.getElementById("tele-e").addEventListener("input", () => validarTelefone("tele-e"));
+    document.getElementById("foto-e").addEventListener("input", () => validarURL("foto-e"));
+
+    document.getElementById("form-e").onsubmit = (e) => {
+        e.preventDefault();
+
+        registros[index] = {
+            nome: document.getElementById("nome-e").value,
+            cep: document.getElementById("cep-e").value,
+            numero: document.getElementById("numero-e").value,
+            complemento: document.getElementById("complemento-e").value,
+            tele: document.getElementById("tele-e").value,
+            foto: document.getElementById("foto-e").value,
+        };
+
+        modal.style.display = "none";
+        renderizarGrid();
+    };
+};
+
+function fecharModal() {
+    let modal = document.getElementById("editarModal");
+    modal.style.display = "none";
+};
+
+function excluirRegistro(index) {
+    registros.splice(index, 1);
+    renderizarGrid();
+};
+
+function limparForm() {
+    document.getElementById("nome").value = "";
+    document.getElementById("cep").value = "";
+    document.getElementById("numero").value = "";
+    document.getElementById("complemento").value = "";
+    document.getElementById("tele").value = "";
+    document.getElementById("foto").value = "";
+};
+
+function mostrarToast(mensagem) {
+
+    let toast = document.getElementById("toast");
+    document.getElementById("textoToast").textContent = mensagem;
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
 
 function validarNome(nome) {
 
@@ -167,7 +235,6 @@ function validarNumero(numero) {
 
     document.getElementById(numero).value = textoF;
 };
-
 
 function validarTelefone(tele) {
     let texto = document.getElementById(tele).value;

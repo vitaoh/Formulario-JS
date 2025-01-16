@@ -10,6 +10,7 @@
 </head>
 
 <body>
+
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-6 md-6">
@@ -45,7 +46,8 @@
                             </div>
                             <div class="form-group mb-4">
                                 <label for="foto">Foto (URL): </label>
-                                <input type="url" placeholder="Insira o URL da foto" class="form-control" id="foto" required>
+                                <input type="url" placeholder="Insira o URL da foto" class="form-control" id="foto"
+                                    required>
                             </div>
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary" id="enviar">Enviar</button>
@@ -57,7 +59,36 @@
             </div>
         </div>
     </div>
-    <div class="modal" id="editarModal" style="display: none; z-index: 3;">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-5">
+                <h3 class="mt-1">Lista de Registros</h3>
+                <div class="mb-3">
+                    <input id="filtroNome" type="text" placeholder="Filtrar por nome" class="form-control">
+                </div>
+            </div>
+            <div class="col-1">
+                <h3 class="mt-1">Alfabeto</h3>
+                <div class="mb-3">
+                    <button class="btn btn-dark" id="ordenar">Ordenar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive"
+        aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <p id="textoToast"></p>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div class="modal" id="editarModal" style="z-index: 5; display: none;">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form id="form-e">
@@ -65,44 +96,43 @@
                         <h5 class="modal-title" id="modalTitleId">
                             Editar
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            id="fechar1"></button>
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
-                            <form id="form">
-                                <div class="form-group mb-3">
-                                    <label for="nome">Nome: </label>
-                                    <input type="text" placeholder="Digite seu nome completo" class="form-control"
-                                        id="nome-e" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="cep">CEP: </label>
-                                    <input type="text" placeholder="00000-000" class="form-control" id="cep-e" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="numero">Número: </label>
-                                    <input type="text" placeholder="Número da residência" class="form-control"
-                                        id="numero-e" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="complemento">Complemento: </label>
-                                    <input type="text" placeholder="Ex: Apt 101" class="form-control"
-                                        id="complemento-e">
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="telefone">Telefone: </label>
-                                    <input type="tel" placeholder="(XX) XXXXX-XXXX" class="form-control" id="tele-e"
-                                        required>
-                                </div>
-                                <div class="form-group mb-4">
-                                    <label for="foto">Foto (URL): </label>
-                                    <input type="url" placeholder="Insira o URL da foto" class="form-control"
-                                        id="foto-e" required>
-                                </div>
+                            <div class="form-group mb-3">
+                                <label for="nome">Nome: </label>
+                                <input type="text" placeholder="Digite seu nome completo" class="form-control"
+                                    id="nome-e" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="cep">CEP: </label>
+                                <input type="text" placeholder="00000-000" class="form-control" id="cep-e" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="numero">Número: </label>
+                                <input type="text" placeholder="Número da residência" class="form-control" id="numero-e"
+                                    required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="complemento">Complemento: </label>
+                                <input type="text" placeholder="Ex: Apt 101" class="form-control" id="complemento-e">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="telefone">Telefone: </label>
+                                <input type="tel" placeholder="(XX) XXXXX-XXXX" class="form-control" id="tele-e"
+                                    required>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="foto">Foto (URL): </label>
+                                <input type="url" placeholder="Insira o URL da foto" class="form-control" id="foto-e"
+                                    required>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="fechar2">
                             Close
                         </button>
                         <button type="submit" class="btn btn-primary" id="salvar">Save</button>
@@ -111,8 +141,20 @@
             </div>
         </div>
     </div>
-    <div></div>
-    <div id="infos" class="container">
+
+    <br><br><br>
+    <div class="row justify-content-center">
+        <div class="col-6">
+
+            <div id="infos" class="row"></div>
+
+            <div class="row">
+                <div class="col-3">
+                    <button id="btnMostrarMais" class="btn btn-primary" style="display: none;">Mostrar Mais</button>
+                </div>
+            </div>
+            
+        </div>
     </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
